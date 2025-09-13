@@ -1,31 +1,43 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/dist
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-/.nx
-/.nx/cache
-/.vscode/*
-!/.vscode/extensions.json
-.idea
-
+# Node
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Optional eslint cache
-.eslintcache
+# Build output
+dist/
+build/
+www/
+
+# Capacitor / Cordova
+ios/
+android/
+
+# Capacitor sync / plugins
+capacitor.config.json.backup
+plugins/
+
+# IDEs / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env / config
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Coverage / testing
+coverage/
+.nyc_output/
+
+# Misc
+package-lock.json
+yarn.lock
