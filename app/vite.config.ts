@@ -4,7 +4,6 @@ import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -16,12 +15,17 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts',
   },
   define: {
-    global: 'globalThis',   // ⬅️ crea alias de global para el browser
-    // opcional si alguna lib lee process.env:
-    // 'process.env': {}
+    global: 'globalThis',
   },
-    optimizeDeps: {
-    // ayuda a preempaquetar correctamente
+  optimizeDeps: {
     include: ['pouchdb-browser', 'pouchdb-find', 'events'],
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
   },
 })

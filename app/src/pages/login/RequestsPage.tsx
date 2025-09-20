@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 
+
 import './LoginPage.css';
 
 export default function LoginPage() {
@@ -37,6 +38,9 @@ export default function LoginPage() {
       setErr('Error al conectar con el servidor');
     }
   }
+
+
+ 
 
   return (
     <IonPage>
@@ -74,7 +78,7 @@ export default function LoginPage() {
             <IonButton expand="block" style={{ marginTop: 20 }} onClick={onSubmit}>
               Entrar
             </IonButton>
-          </IonCardContent>
+             </IonCardContent>
         </IonCard>
       </IonContent>
     </IonPage>
