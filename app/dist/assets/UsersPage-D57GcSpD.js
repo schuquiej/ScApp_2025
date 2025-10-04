@@ -1,1 +1,0 @@
-import{m as s,I as n,n as o,o as a,q as e,t,u as r,v as i}from"./index-DfEn_-7a.js";function l(){return s.jsxs(n,{children:[s.jsx(o,{children:s.jsxs(a,{children:[s.jsx(e,{slot:"start",children:s.jsx(t,{})}),s.jsx(r,{children:"Usuarios"})]})}),s.jsx(i,{className:"ion-padding",children:"Contenido Usuarios"})]})}export{l as default};

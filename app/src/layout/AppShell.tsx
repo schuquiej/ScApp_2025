@@ -45,8 +45,7 @@ export default function AppShell() {
           <Switch>
             <Route path="/app/users" component={UsersPage} exact />
             <Route path="/app/requests" component={RequestsPage} exact />
-            {/* MUY importante: exact y al final */}
-            <Redirect exact from="/app" to="/app/users" />
+          
           </Switch>
         </Suspense>
       </IonRouterOutlet>

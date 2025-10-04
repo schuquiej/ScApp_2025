@@ -11,7 +11,7 @@ export type AppRoute = {
 };
 
 // Páginas (cárgalas donde vivan tus archivos reales)
-const UsersPage      = React.lazy(() => import('../pages/login/UsersPage'));
+const UsersPage      = React.lazy(() => import('../pages/login/RequestsPage'));
 const RequestsPage   = React.lazy(() => import('../pages/login/RequestsPage'));
 
 // Ejemplos de “formularios/*”
@@ -20,13 +20,13 @@ const FormCreate     = React.lazy(() => import('../pages/login/UsersPage'));
 const FormEdit       = React.lazy(() => import('../pages/login/UsersPage'));
 
 // Ejemplos de “solicitudes/*”
-const SolCreate      = React.lazy(() => import('../pages/login/UsersPage'));
-const SolEdit        = React.lazy(() => import('../pages/login/UsersPage'));
+const SolCreate      = React.lazy(() => import('../pages/login/RequestsPage'));
+const SolEdit        = React.lazy(() => import('../pages/login/RequestsPage'));
 
 export const appRoutes: AppRoute[] = [
   // Menú principal
   { path: '/app/users',     exact: true, component: UsersPage,    menuLabel: 'Usuarios',    icon: peopleOutline },
-  { path: '/app/requests',  exact: true, component: RequestsPage, menuLabel: 'Solicitudes', icon: documentTextOutline },
+  { path: '/app/requests',  exact: true, component: RequestsPage, menuLabel: 'Solicitudes', icon: peopleOutline },
 
   // Formularios (solo algunos en menú, otros ocultos)
   { path: '/app/formularios/vista',     exact: true, component: FormList,   menuLabel: 'Formularios', icon: createOutline },

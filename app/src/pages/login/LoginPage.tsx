@@ -1,15 +1,36 @@
 // src/pages/TestLoginIngresosPage.tsx
 import {
-  IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
-  IonInput, IonButton, IonText, IonCard, IonCardContent,
-  IonToast, IonLoading, IonList, IonItem, IonLabel, IonNote,
-  IonSelect, IonSelectOption, IonGrid, IonRow, IonCol
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonInput,
+  IonButton,
+  IonText,
+  IonCard,
+  IonCardContent,
+  IonToast,
+  IonLoading,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonNote,
+  IonSelect,
+  IonSelectOption,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from "@ionic/react";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-
-import { crearIngreso, listarIngresos, borrarIngreso } from "../../apis/APIIngreso";
+import { useIonRouter } from "@ionic/react";
+import {
+  crearIngreso,
+  listarIngresos,
+  borrarIngreso,
+} from "../../apis/APIIngreso";
 
 export default function TestLoginIngresosPage() {
   const [user, setUser] = useState("");
@@ -17,7 +38,9 @@ export default function TestLoginIngresosPage() {
   const { login } = useAuth();
   const history = useHistory();
 
-  const [fecha, setFecha] = useState<string>(new Date().toISOString().slice(0, 10));
+  const [fecha, setFecha] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  );
   const [categoria, setCategoria] = useState<string>("Ventas");
   const [descripcion, setDescripcion] = useState<string>("");
   const [monto, setMonto] = useState<string>("");
@@ -27,17 +50,20 @@ export default function TestLoginIngresosPage() {
   const [loading, setLoading] = useState(false);
 
   const [items, setItems] = useState<any[]>([]);
+  const router = useIonRouter();
 
   async function onSubmitLogin() {
     setErr(null);
     if (!user || !pass) return setErr("Ingrese usuario y contraseña");
+
     try {
-      const fakeJwt =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+      const fakeJwt = "xxx"; // tu token
       if (user === "admin" && pass === "admin") {
         login(fakeJwt);
-      
-        // history.replace("/app/users");
+
+        // 🔑 reemplaza el stack (no deja Login atrás) y fuerza transición correcta
+       router.push('/app/users', 'root', 'replace');
+
         setOk("Inicio de sesión correcto");
       } else {
         setErr("Credenciales inválidas");
@@ -132,8 +158,6 @@ export default function TestLoginIngresosPage() {
       <IonContent className="ion-padding">
         <IonGrid>
           <IonRow className="ion-align-items-start" style={{ gap: 16 }}>
-    
-    
             <IonCol size="12" sizeMd="5">
               <IonCard>
                 <IonCardContent>
@@ -156,15 +180,17 @@ export default function TestLoginIngresosPage() {
                     onKeyDown={(e) => e.key === "Enter" && onSubmitLogin()}
                   />
 
-                  <IonButton expand="block" className="ion-margin-top" onClick={onSubmitLogin}>
+                  <IonButton
+                    expand="block"
+                    className="ion-margin-top"
+                    onClick={onSubmitLogin}
+                  >
                     Entrar
                   </IonButton>
                 </IonCardContent>
               </IonCard>
             </IonCol>
 
-         
-         
             <IonCol size="12" sizeMd="7">
               <IonCard>
                 <IonCardContent>
@@ -175,7 +201,9 @@ export default function TestLoginIngresosPage() {
                     type="date"
                     labelPlacement="stacked"
                     value={fecha}
-                    onIonChange={(e) => setFecha((e.detail.value as string) ?? "")}
+                    onIonChange={(e) =>
+                      setFecha((e.detail.value as string) ?? "")
+                    }
                   />
 
                   <IonInput
@@ -204,14 +232,25 @@ export default function TestLoginIngresosPage() {
                     onIonChange={(e) => setMonto(e.detail.value ?? "")}
                   />
 
-                  <div className="ion-margin-top" style={{ display: "grid", gap: 8 }}>
+                  <div
+                    className="ion-margin-top"
+                    style={{ display: "grid", gap: 8 }}
+                  >
                     <IonButton onClick={onCrearIngreso} disabled={loading}>
                       Guardar ingreso
                     </IonButton>
-                    <IonButton onClick={onValidarServicio} fill="outline" disabled={loading}>
+                    <IonButton
+                      onClick={onValidarServicio}
+                      fill="outline"
+                      disabled={loading}
+                    >
                       Validar servicio (crear prueba)
                     </IonButton>
-                    <IonButton onClick={cargarIngresos} fill="clear" disabled={loading}>
+                    <IonButton
+                      onClick={cargarIngresos}
+                      fill="clear"
+                      disabled={loading}
+                    >
                       Recargar lista
                     </IonButton>
                   </div>
@@ -220,7 +259,6 @@ export default function TestLoginIngresosPage() {
             </IonCol>
           </IonRow>
         </IonGrid>
-
 
         <IonCard>
           <IonCardContent>
@@ -235,7 +273,12 @@ export default function TestLoginIngresosPage() {
                   <IonNote slot="end">
                     {i.fecha} · Q {Number(i.monto).toFixed(2)}
                   </IonNote>
-                  <IonButton slot="end" fill="clear" color="danger" onClick={() => onBorrar(i._id)}>
+                  <IonButton
+                    slot="end"
+                    fill="clear"
+                    color="danger"
+                    onClick={() => onBorrar(i._id)}
+                  >
                     Borrar
                   </IonButton>
                 </IonItem>
@@ -244,10 +287,24 @@ export default function TestLoginIngresosPage() {
           </IonCardContent>
         </IonCard>
 
-
         <IonLoading isOpen={loading} message="Procesando..." />
-        {err && <IonToast isOpen={!!err} color="danger" message={err} duration={1700} onDidDismiss={() => setErr(null)} />}
-        {ok && <IonToast isOpen={!!ok} message={ok} duration={1500} onDidDismiss={() => setOk(null)} />}
+        {err && (
+          <IonToast
+            isOpen={!!err}
+            color="danger"
+            message={err}
+            duration={1700}
+            onDidDismiss={() => setErr(null)}
+          />
+        )}
+        {ok && (
+          <IonToast
+            isOpen={!!ok}
+            message={ok}
+            duration={1500}
+            onDidDismiss={() => setOk(null)}
+          />
+        )}
       </IonContent>
     </IonPage>
   );
