@@ -10,16 +10,14 @@ export type AppRoute = {
   roles?: string[];          
 };
 
-// Páginas (cárgalas donde vivan tus archivos reales)
 const UsersPage      = React.lazy(() => import('../pages/login/RequestsPage'));
 const RequestsPage   = React.lazy(() => import('../pages/login/RequestsPage'));
 
-// Ejemplos de “formularios/*”
 const FormList       = React.lazy(() => import('../pages/login/UsersPage'));      // crea el archivo
 const FormCreate     = React.lazy(() => import('../pages/login/UsersPage'));
 const FormEdit       = React.lazy(() => import('../pages/login/UsersPage'));
 
-// Ejemplos de “solicitudes/*”
+// solicitudes
 const SolCreate      = React.lazy(() => import('../pages/login/RequestsPage'));
 const SolEdit        = React.lazy(() => import('../pages/login/RequestsPage'));
 

@@ -11,7 +11,7 @@ export interface CitaResponse {
   profesionalNombre: string;
   servicioId: number;
   servicioNombre: string;
-  fechaHora: string;   // ISO-8601
+  fechaHora: string;   
   estado: EstadoCita;
   notas?: string;
 }
@@ -20,7 +20,7 @@ export interface CitaDTO {
   clienteId: number;
   profesionalId: number;
   servicioId: number;
-  fechaHora: string;   // ISO-8601 (ej. 2025-09-27T10:30:00)
+  fechaHora: string;   
   estado?: EstadoCita;
   notas?: string;
 }

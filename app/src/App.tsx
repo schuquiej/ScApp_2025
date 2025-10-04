@@ -24,7 +24,17 @@ import LoginPage from "./pages/login/LoginPage";
 import UsersPage from "./pages/login/UsersPage";
 import CitasListPage from "./pages/citas/CitasListPage";
 import CitasCreatePage from "./pages/citas/CitasCreatePage";
+
+import ClientesListPage from "./pages/clientes/ClientesListPage";
+import ClientesCreatePage from "./pages/clientes/ClientesCreatePage";
+
+import ServiciosListPage from "./pages/servicios/ServiciosListPage";
+import ServiciosCreatePage from "./pages/servicios/ServiciosCreatePage";
+
+
 import { useAuth } from "./auth/AuthContext";
+import ProfesionalCreatePage from "./pages/profesional/ProfesionalCreatePage";
+import ProfesionalListPage from "./pages/profesional/ProfesionalListPage";
 
 setupIonicReact();
 
@@ -114,6 +124,102 @@ export default function App() {
                             </IonList>
                           </div>
                         </IonAccordion>
+
+                        {/* CLIENTES */}
+                        <IonAccordion value="clientes">
+                          <IonItem slot="header" lines="none">
+                            <IonLabel>Clientes</IonLabel>
+                          </IonItem>
+                          <div slot="content">
+                            <IonList>
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/clientes/crear"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Crear</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/clientes"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Listar</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+                            </IonList>
+                          </div>
+                        </IonAccordion>
+
+                        {/* SERVICIOS */}
+                        <IonAccordion value="servicios">
+                          <IonItem slot="header" lines="none">
+                            <IonLabel>Servicios</IonLabel>
+                          </IonItem>
+                          <div slot="content">
+                            <IonList>
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/servicios/crear"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Crear</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/servicios"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Listar</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+                            </IonList>
+                          </div>
+                        </IonAccordion>
+
+                        {/* PROFESIONAL */}
+                        <IonAccordion value="profesional">
+                          <IonItem slot="header" lines="none">
+                            <IonLabel>Profesional</IonLabel>
+                          </IonItem>
+                          <div slot="content">
+                            <IonList>
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/profesional/crear"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Crear</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/profesional"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Listar</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+                            </IonList>
+                          </div>
+                        </IonAccordion>
                       </IonAccordionGroup>
                     </IonContent>
                   </IonMenu>
@@ -134,7 +240,45 @@ export default function App() {
                         exact
                       />
 
-                      {/* Redirección por defecto dentro de /app */}
+                      {/* clientes */}
+                      <Route
+                        path="/app/clientes"
+                        component={ClientesListPage}
+                        exact
+                      />
+                      <Route
+                        path="/app/clientes/crear"
+                        component={ClientesCreatePage}
+                        exact
+                      />
+
+                      {/* servicios */}
+                      <Route
+                        path="/app/servicios"
+                        component={ServiciosListPage}
+                        exact
+                      />
+                      <Route
+                        path="/app/servicios/crear"
+                        component={ServiciosCreatePage}
+                        exact
+                      />
+
+
+
+                        {/* PROFESIONAL */}
+                      <Route
+                        path="/app/profesional"
+                        component={ProfesionalListPage}
+                        exact
+                      />
+                      <Route
+                        path="/app/profesional/crear"
+                        component={ProfesionalCreatePage}
+                        exact
+                      />
+
+                      {/* Redirección al home */}
                       <Redirect exact from="/app" to="/app/users" />
                     </Switch>
                   </IonRouterOutlet>

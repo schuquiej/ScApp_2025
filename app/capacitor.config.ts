@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'SCApp',
   webDir: 'dist',        
   server: {
-    androidScheme: 'https' 
+    androidScheme: 'http' 
   }
 };
 export default config;
