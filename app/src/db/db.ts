@@ -4,4 +4,4 @@ import PouchFind from 'pouchdb-find';
 
 PouchDB.plugin(PouchFind);
 
-export const localDB = new PouchDB('appdb');
+export const localDB = new PouchDB('db_sergio');
