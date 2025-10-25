@@ -1,6 +1,6 @@
 // src/hooks/useDocs.ts
 import { useEffect, useState } from 'react';
-import { localDB } from '../../db/db';
+import { localDB } from '../../db/pouch';
 
 export function useDocs(selector: any, deps: any[] = []) {
   const [rows, setRows] = useState<any[]>([]);

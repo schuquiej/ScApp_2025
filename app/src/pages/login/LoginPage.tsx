@@ -1,4 +1,4 @@
-// src/pages/TestLoginIngresosPage.tsx
+
 import {
   IonPage,
   IonHeader,
@@ -12,12 +12,6 @@ import {
   IonCardContent,
   IonToast,
   IonLoading,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonNote,
-  IonSelect,
-  IonSelectOption,
   IonGrid,
   IonRow,
   IonCol,
@@ -26,11 +20,9 @@ import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { useIonRouter } from "@ionic/react";
-import {
-  crearIngreso,
-  listarIngresos,
-  borrarIngreso,
-} from "../../apis/APIIngreso";
+
+import { jwtDecode } from "jwt-decode";
+
 
 export default function TestLoginIngresosPage() {
   const [user, setUser] = useState("");
@@ -41,9 +33,6 @@ export default function TestLoginIngresosPage() {
   const [fecha, setFecha] = useState<string>(
     new Date().toISOString().slice(0, 10)
   );
-  const [categoria, setCategoria] = useState<string>("Ventas");
-  const [descripcion, setDescripcion] = useState<string>("");
-  const [monto, setMonto] = useState<string>("");
 
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
@@ -53,18 +42,39 @@ export default function TestLoginIngresosPage() {
   const router = useIonRouter();
 
   async function onSubmitLogin() {
-    setErr(null);
     if (!user || !pass) return setErr("Ingrese usuario y contraseña");
 
     try {
-      const fakeJwt = "xxx"; // tu token
-      if (user === "admin" && pass === "admin") {
-        login(fakeJwt);
+      if (user === "5555" && pass === "admin") {
+        const demoJwt =
+          "eyJhbGciOiJub25lIn0." +
+          "eyJzdWIiOiJzZ555555XJnaW8iLCJyb2xlcyI6WyJBRE1JTiIsIlBST01PVE9SIl0sImV4cCI6MTg5MzQ1NjAwMH0." +
+          "";
+        const dec = jwtDecode<any>(demoJwt);
+        const now = Date.now() / 1000;
 
-        // 🔑 reemplaza el stack (no deja Login atrás) y fuerza transición correcta
-       router.push('/app/users', 'root', 'replace');
+        if (!dec.exp || dec.exp < now) {
+          throw new Error("Token expirado o inválido");
+        }
 
-        setOk("Inicio de sesión correcto");
+        try {
+          const dec = jwtDecode<any>(demoJwt);
+          const now = Date.now() / 1000;
+
+          if (!dec.exp || dec.exp < now) {
+            throw new Error("Token expirado o inválido");
+          }
+
+        
+
+          // Si pasa la validación
+          login(demoJwt);
+          router.push("/app/home", "root", "replace");
+          setOk("Inicio de sesión correcto");
+        } catch (err) {
+          console.error("Token inválido:", err);
+          setErr("Token inválido o expirado");
+        }
       } else {
         setErr("Credenciales inválidas");
       }
@@ -73,85 +83,11 @@ export default function TestLoginIngresosPage() {
     }
   }
 
-  async function cargarIngresos() {
-    try {
-      const data = await listarIngresos();
-      setItems(data as any);
-    } catch (e) {
-      console.error(e);
-      setErr("Error al listar ingresos");
-    }
-  }
-
-  useEffect(() => {
-    cargarIngresos();
-  }, []);
-
-  async function onCrearIngreso() {
-    setErr(null);
-    if (!fecha || !categoria || !monto) {
-      setErr("Complete fecha, categoría y monto");
-      return;
-    }
-    setLoading(true);
-    try {
-      await crearIngreso({
-        fecha,
-        categoria,
-        descripcion: descripcion || undefined,
-        monto: Number(monto),
-      });
-      setOk("Ingreso guardado");
-      setDescripcion("");
-      setMonto("");
-      await cargarIngresos();
-    } catch (e) {
-      console.error(e);
-      setErr("No se pudo guardar el ingreso");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onValidarServicio() {
-    setLoading(true);
-    try {
-      await crearIngreso({
-        fecha: new Date().toISOString().slice(0, 10),
-        categoria: "Prueba",
-        descripcion: "Ingreso de validación",
-        monto: 123.45,
-      });
-      setOk("Validación OK: ingreso de prueba creado");
-      await cargarIngresos();
-    } catch (e) {
-      console.error(e);
-      setErr("Falló la validación");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onBorrar(id?: string) {
-    if (!id) return;
-    setLoading(true);
-    try {
-      await borrarIngreso(id);
-      setOk("Ingreso borrado");
-      await cargarIngresos();
-    } catch (e) {
-      console.error(e);
-      setErr("No se pudo borrar");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Pruebas: Login + Ingresos</IonTitle>
+          <IonTitle>Login </IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -161,7 +97,7 @@ export default function TestLoginIngresosPage() {
             <IonCol size="12" sizeMd="5">
               <IonCard>
                 <IonCardContent>
-                  <h2 style={{ marginBottom: 12 }}>Login de prueba</h2>
+                  <h2 style={{ marginBottom: 12 }}>Login</h2>
 
                   <IonInput
                     label="Usuario"
@@ -190,102 +126,8 @@ export default function TestLoginIngresosPage() {
                 </IonCardContent>
               </IonCard>
             </IonCol>
-
-            <IonCol size="12" sizeMd="7">
-              <IonCard>
-                <IonCardContent>
-                  <h2 style={{ marginBottom: 12 }}>Ingresos (Pouch)</h2>
-
-                  <IonInput
-                    label="Fecha"
-                    type="date"
-                    labelPlacement="stacked"
-                    value={fecha}
-                    onIonChange={(e) =>
-                      setFecha((e.detail.value as string) ?? "")
-                    }
-                  />
-
-                  <IonInput
-                    label="Categoría"
-                    labelPlacement="stacked"
-                    className="ion-margin-top"
-                    value={categoria}
-                    onIonChange={(e) => setCategoria(e.detail.value ?? "")}
-                  />
-
-                  <IonInput
-                    label="Descripción"
-                    labelPlacement="stacked"
-                    className="ion-margin-top"
-                    value={descripcion}
-                    onIonChange={(e) => setDescripcion(e.detail.value ?? "")}
-                  />
-
-                  <IonInput
-                    label="Monto (Q)"
-                    type="number"
-                    inputmode="decimal"
-                    labelPlacement="stacked"
-                    className="ion-margin-top"
-                    value={monto}
-                    onIonChange={(e) => setMonto(e.detail.value ?? "")}
-                  />
-
-                  <div
-                    className="ion-margin-top"
-                    style={{ display: "grid", gap: 8 }}
-                  >
-                    <IonButton onClick={onCrearIngreso} disabled={loading}>
-                      Guardar ingreso
-                    </IonButton>
-                    <IonButton
-                      onClick={onValidarServicio}
-                      fill="outline"
-                      disabled={loading}
-                    >
-                      Validar servicio (crear prueba)
-                    </IonButton>
-                    <IonButton
-                      onClick={cargarIngresos}
-                      fill="clear"
-                      disabled={loading}
-                    >
-                      Recargar lista
-                    </IonButton>
-                  </div>
-                </IonCardContent>
-              </IonCard>
-            </IonCol>
           </IonRow>
         </IonGrid>
-
-        <IonCard>
-          <IonCardContent>
-            <h2 style={{ marginBottom: 12 }}>Listado</h2>
-            <IonList>
-              {items.map((i: any) => (
-                <IonItem key={i._id}>
-                  <IonLabel>
-                    <h2>{i.categoria}</h2>
-                    <p>{i.descripcion}</p>
-                  </IonLabel>
-                  <IonNote slot="end">
-                    {i.fecha} · Q {Number(i.monto).toFixed(2)}
-                  </IonNote>
-                  <IonButton
-                    slot="end"
-                    fill="clear"
-                    color="danger"
-                    onClick={() => onBorrar(i._id)}
-                  >
-                    Borrar
-                  </IonButton>
-                </IonItem>
-              ))}
-            </IonList>
-          </IonCardContent>
-        </IonCard>
 
         <IonLoading isOpen={loading} message="Procesando..." />
         {err && (

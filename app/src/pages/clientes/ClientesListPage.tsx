@@ -1,15 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
-  IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton,
-  IonContent, IonRefresher, IonRefresherContent,
-  IonList, IonItem, IonLabel, IonNote, IonButton, IonIcon, IonToast
-} from '@ionic/react';
-import { refreshOutline, trashOutline, addOutline } from 'ionicons/icons';
-import { listarCitas, borrarCita, CitaResponse } from '../../apis/citas';
-import { useIonRouter } from '@ionic/react';
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonMenuButton,
+  IonContent,
+  IonRefresher,
+  IonRefresherContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonNote,
+  IonButton,
+  IonIcon,
+  IonToast,
+} from "@ionic/react";
+import { refreshOutline, trashOutline, addOutline } from "ionicons/icons";
+import { useIonRouter } from "@ionic/react";
+import { listarCitas } from "../../db/pouchApi";
+import { removeDocGeneric } from "../../apis/couchGenericApi";
 
 export default function ClientesListPage() {
-  const [items, setItems] = useState<CitaResponse[]>([]);
+  // sergio aca
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [ok, setOk] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -18,24 +33,28 @@ export default function ClientesListPage() {
   async function cargar() {
     setLoading(true);
     try {
-      const data = await listarCitas();
+      const selectors = {};
+      const data = await listarCitas("clientes", selectors);
+
       setItems(data);
     } catch (e: any) {
-      setErr(e?.message || 'Error al cargar citas');
+      setErr(e?.message || "Error al cargar citas");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { cargar(); }, []);
+  useEffect(() => {
+    cargar();
+  }, []);
 
-  async function onDelete(id: number) {
+  async function onDelete(id: string) {
     try {
-      await borrarCita(id);
-      setOk('Cita eliminada');
+      await removeDocGeneric(id, "clientes"); // o la DB que corresponda
+      setOk("Cita eliminada");
       await cargar();
     } catch (e: any) {
-      setErr(e?.message || 'No se pudo eliminar');
+      setErr(e?.message || "No se pudo eliminar");
     }
   }
 
@@ -43,10 +62,14 @@ export default function ClientesListPage() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot="start"><IonMenuButton /></IonButtons>
+          <IonButtons slot="start">
+            <IonMenuButton />
+          </IonButtons>
           <IonTitle>Clientes · Listado</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => router.push('/app/citas/crear', 'forward')}>
+            <IonButton
+              onClick={() => router.push("/app/clientes/crear", "forward")}
+            >
               <IonIcon icon={addOutline} slot="icon-only" />
             </IonButton>
           </IonButtons>
@@ -54,28 +77,55 @@ export default function ClientesListPage() {
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <IonRefresher slot="fixed" onIonRefresh={async (e) => { await cargar(); e.detail.complete(); }}>
+        <IonRefresher
+          slot="fixed"
+          onIonRefresh={async (e) => {
+            await cargar();
+            e.detail.complete();
+          }}
+        >
           <IonRefresherContent pullingIcon={refreshOutline} />
         </IonRefresher>
 
         <IonList>
-          {items.map(c => (
-            <IonItem key={c.id} lines="full">
+          {items.map((c) => (
+            <IonItem key={c._id} lines="full">
               <IonLabel>
-                <h2>{c.clienteNombre} → {c.profesionalNombre}</h2>
-                <p>{c.servicioNombre} · {new Date(c.fechaHora).toLocaleString()}</p>
-                <p>Estado: {c.estado}{c.notas ? ` · ${c.notas}` : ''}</p>
+                <h2>{c.clienteNombre}</h2>
+                <p>
+                  {c.servicioNombre} · {new Date(c.createdAt).toLocaleString()}
+                </p>
+
+                <p>Telefono: {c.clienteTelefono} </p>
+                <p>DPI: {c.clienteDPI} </p>
+                <p>Correo: {c.clienteCorreo} </p>
               </IonLabel>
               <IonNote slot="end">#{c.id}</IonNote>
-              <IonButton slot="end" fill="clear" color="danger" onClick={() => onDelete(c.id)}>
+              <IonButton
+                slot="end"
+                fill="clear"
+                color="danger"
+                onClick={() => onDelete(c._id)}
+              >
                 <IonIcon icon={trashOutline} slot="icon-only" />
               </IonButton>
             </IonItem>
           ))}
         </IonList>
 
-        <IonToast isOpen={!!ok} message={ok!} duration={1300} onDidDismiss={() => setOk(null)} />
-        <IonToast isOpen={!!err} color="danger" message={err!} duration={1600} onDidDismiss={() => setErr(null)} />
+        <IonToast
+          isOpen={!!ok}
+          message={ok!}
+          duration={1300}
+          onDidDismiss={() => setOk(null)}
+        />
+        <IonToast
+          isOpen={!!err}
+          color="danger"
+          message={err!}
+          duration={1600}
+          onDidDismiss={() => setErr(null)}
+        />
       </IonContent>
     </IonPage>
   );

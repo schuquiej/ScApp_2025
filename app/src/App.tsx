@@ -1,5 +1,5 @@
 // src/App.tsx
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   IonMenu,
   IonHeader,
@@ -19,6 +19,7 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route, Redirect, Switch } from "react-router-dom";
+import { useIonRouter } from "@ionic/react"; // 👈 agregado
 
 import LoginPage from "./pages/login/LoginPage";
 import UsersPage from "./pages/login/UsersPage";
@@ -31,18 +32,84 @@ import ClientesCreatePage from "./pages/clientes/ClientesCreatePage";
 import ServiciosListPage from "./pages/servicios/ServiciosListPage";
 import ServiciosCreatePage from "./pages/servicios/ServiciosCreatePage";
 
-
 import { useAuth } from "./auth/AuthContext";
 import ProfesionalCreatePage from "./pages/profesional/ProfesionalCreatePage";
 import ProfesionalListPage from "./pages/profesional/ProfesionalListPage";
 
+import { syncEnabledDataSources } from "./apis/couchCatalogAPI";
+import HomePage from "./pages/home/homePage"; // 👈 PascalCase
+import { syncSolicitudesFromRemote } from "./db/remote/couch";
+import FacturaListPage from "./pages/facturacion/FacturaListPage";
+import FacturaCreatePage from "./pages/facturacion/FacturaCreatePage";
+
 setupIonicReact();
 
 export default function App() {
-  const { auth } = useAuth();
+  const { auth, logout } = useAuth(); // 👈 obtenemos logout
+  const router = useIonRouter(); // 👈 para navegar al cerrar sesión
+
   const DEV_FREE_PASS = false;
   const isAuthed =
     DEV_FREE_PASS || !!(auth.token || localStorage.getItem("access_token"));
+
+  const syncRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (isAuthed) {
+      (async () => {
+        try {
+          await syncEnabledDataSources();
+          await syncEnabledDataSources({ live: true });
+
+          const h1 = await syncSolicitudesFromRemote("db_sergio", {
+            type: "cita",
+          });
+          const h2 = await syncSolicitudesFromRemote("clientes", {
+            type: "cliente",
+          });
+
+          const h3 = await syncSolicitudesFromRemote("servicios", {});
+
+          const h4 = await syncSolicitudesFromRemote("profesiones", {});
+
+          // guarda canceladores
+          syncRef.current = {
+            cancelAll: () => {
+              try {
+                h1?.cancel?.();
+              } catch {}
+              try {
+                h2?.cancel?.();
+              } catch {}
+              try {
+                h3?.cancel?.();
+              } catch {}
+              try {
+                h4?.cancel?.();
+              } catch {}
+            },
+          };
+        } catch (e) {
+          console.error("No se pudo iniciar la sync:", e);
+        }
+      })();
+    } else {
+      syncRef.current = null;
+      console.log("🛑 Sync detenida (no autenticado)");
+    }
+    return () => {
+      syncRef.current = null;
+    };
+  }, [isAuthed]);
+
+  // 👇 Handler para cerrar sesión
+  const handleLogout = () => {
+    try {
+      logout(); // limpia access_token y estado
+    } finally {
+      router.push("/login", "root", "replace"); // manda al login
+    }
+  };
 
   return (
     <IonApp>
@@ -52,7 +119,7 @@ export default function App() {
             path="/login"
             exact
             render={() =>
-              isAuthed ? <Redirect to="/app/users" /> : <LoginPage />
+              isAuthed ? <Redirect to="/app/home" /> : <LoginPage />
             }
           />
 
@@ -71,6 +138,20 @@ export default function App() {
                     </IonHeader>
 
                     <IonContent>
+                      <IonList>
+                        {/* HOME */}
+                        <IonMenuToggle autoHide={true}>
+                          <IonItem
+                            routerLink="/app/home"
+                            routerDirection="root"
+                            detail={false}
+                            lines="none"
+                          >
+                            <IonLabel>Home</IonLabel>
+                          </IonItem>
+                        </IonMenuToggle>
+                      </IonList>
+
                       <IonAccordionGroup multiple={true}>
                         {/* USUARIOS */}
                         <IonAccordion value="usuarios">
@@ -220,12 +301,64 @@ export default function App() {
                             </IonList>
                           </div>
                         </IonAccordion>
+
+
+
+                        
+                        {/* FACTURA */}
+                        <IonAccordion value="factura">
+                          <IonItem slot="header" lines="none">
+                            <IonLabel>Factura</IonLabel>
+                          </IonItem>
+                          <div slot="content">
+                            <IonList>
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/factura/crear"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Facturar</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+
+                              <IonMenuToggle autoHide={true}>
+                                <IonItem
+                                  routerLink="/app/factura"
+                                  routerDirection="root"
+                                  detail={false}
+                                  lines="none"
+                                >
+                                  <IonLabel>Listar</IonLabel>
+                                </IonItem>
+                              </IonMenuToggle>
+                            </IonList>
+                          </div>
+                        </IonAccordion>
+
+
+                        {/* CERRAR SESIÓN */}
+                        <IonMenuToggle autoHide={true}>
+                          <IonItem
+                            button
+                            onClick={handleLogout}
+                            detail={false}
+                            lines="none"
+                          >
+                            <IonLabel>Cerrar sesión</IonLabel>
+                          </IonItem>
+                        </IonMenuToggle>
                       </IonAccordionGroup>
                     </IonContent>
                   </IonMenu>
 
                   <IonRouterOutlet id="main">
                     <Switch>
+                      {/* HOME */}
+                      <Route path="/app/home" component={HomePage} exact />
+
+                      {/* Usuarios (si la usas) */}
                       <Route path="/app/users" component={UsersPage} exact />
 
                       {/* Citas */}
@@ -240,7 +373,7 @@ export default function App() {
                         exact
                       />
 
-                      {/* clientes */}
+                      {/* Clientes */}
                       <Route
                         path="/app/clientes"
                         component={ClientesListPage}
@@ -252,7 +385,7 @@ export default function App() {
                         exact
                       />
 
-                      {/* servicios */}
+                      {/* Servicios */}
                       <Route
                         path="/app/servicios"
                         component={ServiciosListPage}
@@ -264,9 +397,7 @@ export default function App() {
                         exact
                       />
 
-
-
-                        {/* PROFESIONAL */}
+                      {/* Profesional */}
                       <Route
                         path="/app/profesional"
                         component={ProfesionalListPage}
@@ -278,8 +409,21 @@ export default function App() {
                         exact
                       />
 
+
+                       {/* facturas */}
+                      <Route
+                        path="/app/factura"
+                        component={FacturaListPage}
+                        exact
+                      />
+                      <Route
+                        path="/app/factura/crear"
+                        component={FacturaCreatePage}
+                        exact
+                      />
+
                       {/* Redirección al home */}
-                      <Redirect exact from="/app" to="/app/users" />
+                      <Redirect exact from="/app" to="/app/home" />
                     </Switch>
                   </IonRouterOutlet>
                 </IonSplitPane>
@@ -287,7 +431,8 @@ export default function App() {
             }
           />
 
-          <Redirect exact from="/" to={isAuthed ? "/app/users" : "/login"} />
+          {/* Root → según autenticación, ahora a /app/home */}
+          <Redirect exact from="/" to={isAuthed ? "/app/home" : "/login"} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
